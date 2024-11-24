@@ -1,0 +1,15 @@
+.profile__image_edit{
+    width: 120px;
+	height: 120px;
+	position: absolute;
+}
+
+.profile__image_edit:hover {
+    background-position: center;
+	background-repeat: no-repeat;
+	background-size: 26px;
+    opacity: 0.6;
+    background-image: url("../../../images/edit-icon.svg");
+    background-color: black;
+    cursor: pointer;
+}
