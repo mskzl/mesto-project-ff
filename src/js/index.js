@@ -1,9 +1,9 @@
 // Импорты
-import "../src/index.css";
-import {openModal, closeModal} from "./components/modal";
-import {createCard, handleLikeClick} from "./components/card";
-import {clearValidation, enableValidation} from "./components/validation";
-import {getCardList, getCurrentUser, modifyUserDetails, createNewCard, changeUserAvatar} from "./components/api";
+import "../webfonts/index.css";
+import {openModal, closeModal} from "./modal.js";
+import {createCard, handleLikeClick, openDeleteModal} from "./card.js";
+import {clearValidation, enableValidation} from "./validation.js";
+import {getCardList, getCurrentUser, modifyUserDetails, createNewCard, changeUserAvatar} from "./api.js";
 
 // Константы
 const cardsContainer = document.querySelector(".places__list");
@@ -32,9 +32,14 @@ const avatarImg = document.querySelector(".profile__image");
 const avatarPopup = document.querySelector(".popup_type_new-avatar");
 const template = document.querySelector("#card-template").content;
 
+const deleteCardPopup = document.querySelector(".popup_type_delete-card");
+const deleteCardForm = document.forms["delete-card"];
 const avatarInput = document.forms["new-avatar_img"];
 const avatarUrlInput = avatarInput.link;
 const avatarImgBlock = document.querySelector(".profile__image");
+
+const popupImageElement = popupImage.querySelector(".popup__image");
+  const caption = popupImage.querySelector(".popup__caption");
 
 const validationConfig = {
   formSelector: ".popup__form",
@@ -53,6 +58,22 @@ avatarImg.addEventListener("click", () => openModal(avatarPopup));
 formEditProfile.addEventListener("submit", profileFormHandler);
 formAddCard.addEventListener("submit", addCard);
 avatarInput.addEventListener("submit", editAvatarInputSubmit);
+
+// Удаление карточки по подтверждению
+deleteCardForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (window.currentCardToDelete) {
+    window.currentCardToDelete
+      .removeCard() // Асинхронный запрос на удаление
+      .then(() => {
+        closeModal(deleteCardPopup); // Закрытие окна только после успешного удаления
+      })
+      .catch((err) => {
+        console.error("Ошибка при удалении карточки", err);
+        // Можно показать пользователю сообщение об ошибке
+      });
+  }
+});
 
 closeButtons.forEach((button) =>
   button.addEventListener("click", () => closeModal(button.closest(".popup")))
@@ -100,7 +121,17 @@ function addCard(event) {
   setButtonLoadingState(true, formAddCard);
   createNewCard(inputCardTitle.value, inputCardLink.value)
     .then((card) => {
-      const newCard = createCard(card,template,handleLikeClick,handleImageClick,card.owner._id);
+      const newCard = createCard(
+        card,
+        template,
+        handleLikeClick,
+        handleImageClick,
+        card.owner._id,
+        openModal,
+        closeModal,
+        deleteCardPopup,
+        openDeleteModal
+      );
       cardsContainer.prepend(newCard);
       formAddCard.reset();
       closeModal(popupNewCard);
@@ -123,8 +154,6 @@ function editAvatarInputSubmit(event) {
 }
 
 function handleImageClick(cardInfo) {
-  const popupImageElement = popupImage.querySelector(".popup__image");
-  const caption = popupImage.querySelector(".popup__caption");
   popupImageElement.alt = cardInfo.name;
   popupImageElement.src = cardInfo.link;
   caption.textContent = cardInfo.name;
@@ -133,7 +162,7 @@ function handleImageClick(cardInfo) {
 
 function drawCards(cards, userId) {
   cards.forEach((item) => {
-    const card = createCard(item, template, handleLikeClick, handleImageClick, userId);
+    const card = createCard(item, template, handleLikeClick, handleImageClick, userId, openModal, closeModal, deleteCardPopup, openDeleteModal);
     cardsContainer.append(card);
   });
 }
@@ -148,3 +177,4 @@ Promise.all([getCurrentUser(), getCardList()])
     drawCards(cards, user._id);
   })
   .catch((err) => console.error(`Ошибка: ${err}`));
+

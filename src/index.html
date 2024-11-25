@@ -10,11 +10,11 @@
 <body class="page">
 <div class="page__content">
   <header class="header page__section">
-    <img src="<%=require('../images/logo.svg')%>" alt="Логотип проекта масто" class="logo header__logo">
+    <img src="<%=require('./images/logo.svg')%>" alt="Логотип проекта масто" class="logo header__logo">
   </header>
   <main class="content">
     <section class="profile page__section">
-      <div class="profile__image" style="background-image: url(<%=require('../images/avatar.jpg')%>)">
+      <div class="profile__image" style="background-image: url(<%=require('./images/avatar.jpg')%>)">
         <div class="profile__image_edit"></div>
       </div>
       <div class="profile__info">
@@ -39,14 +39,14 @@
         <input type="text" name="name" id="name-input" class="popup__input popup__input_type_name" placeholder="Имя"
         minlength="2"
         maxlength="40"
-        pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]"
+        pattern="[a-zA-Zа-яА-Я\-\s]{1,}"
         data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
         required>
         <span class="name-input-error"></span>
         <input type="text" name="description" id="description-input" class="popup__input popup__input_type_description" placeholder="Занятие"
         minlength="2"
         maxlength="200"
-        pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]"
+        pattern="[a-zA-Zа-яА-Я\-\s]{1,}"
         data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
         required>
         <span class="description-input-error"></span>
@@ -79,7 +79,7 @@
         <input type="text" id="place-name-input" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название"
         minlength="2"
         maxlength="30"
-        pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]"
+        pattern="[a-zA-Zа-яА-Я\-\s]{1,}"
         data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
         required>
         <span class="place-name-input-error"></span>

@@ -1,13 +1,13 @@
 export function openModal(popup) {
   popup.classList.add("popup_is-opened");
   popup.addEventListener("click", handleOverlayClick);
-  document.addEventListener("keydown",handleEscClose);
-  }
+  document.addEventListener("keydown", handleEscClose);
+}
   
 export function closeModal(popup) {
   popup.classList.remove("popup_is-opened");
   popup.removeEventListener("click", handleOverlayClick);
-  document.removeEventListener("keydown",handleEscClose);
+  document.removeEventListener("keydown", handleEscClose);
 }
 
 export function handleEscClose(event) {
