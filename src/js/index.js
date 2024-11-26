@@ -1,9 +1,15 @@
-// Импорты
 import "../webfonts/index.css";
-import {openModal, closeModal} from "./modal.js";
-import {createCard, handleLikeClick, openDeleteModal} from "./card.js";
-import {clearValidation, enableValidation} from "./validation.js";
-import {getCardList, getCurrentUser, modifyUserDetails, createNewCard, changeUserAvatar} from "./api.js";
+import { openModal, closeModal } from "./modal.js";
+import { createCard, handleLikeClick } from "./card.js";
+import { clearValidation, enableValidation } from "./validation.js";
+import {
+  getCardList,
+  getCurrentUser,
+  modifyUserDetails,
+  createNewCard,
+  changeUserAvatar,
+  removeCardById,
+} from "./api.js";
 
 // Константы
 const cardsContainer = document.querySelector(".places__list");
@@ -39,7 +45,7 @@ const avatarUrlInput = avatarInput.link;
 const avatarImgBlock = document.querySelector(".profile__image");
 
 const popupImageElement = popupImage.querySelector(".popup__image");
-  const caption = popupImage.querySelector(".popup__caption");
+const caption = popupImage.querySelector(".popup__caption");
 
 const validationConfig = {
   formSelector: ".popup__form",
@@ -59,20 +65,19 @@ formEditProfile.addEventListener("submit", profileFormHandler);
 formAddCard.addEventListener("submit", addCard);
 avatarInput.addEventListener("submit", editAvatarInputSubmit);
 
-// Удаление карточки по подтверждению
 deleteCardForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  if (window.currentCardToDelete) {
-    window.currentCardToDelete
-      .removeCard() // Асинхронный запрос на удаление
-      .then(() => {
-        closeModal(deleteCardPopup); // Закрытие окна только после успешного удаления
-      })
-      .catch((err) => {
-        console.error("Ошибка при удалении карточки", err);
-        // Можно показать пользователю сообщение об ошибке
-      });
-  }
+  const cardId = deleteCardForm.dataset.cardId;
+
+  removeCardById(cardId)
+    .then(() => {
+      const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+      cardElement.remove();
+      closeModal(deleteCardPopup);
+    })
+    .catch((err) => {
+      console.error("Ошибка при удалении карточки", err);
+    });
 });
 
 closeButtons.forEach((button) =>
@@ -127,10 +132,7 @@ function addCard(event) {
         handleLikeClick,
         handleImageClick,
         card.owner._id,
-        openModal,
-        closeModal,
-        deleteCardPopup,
-        openDeleteModal
+        handleOpenDeleteModal
       );
       cardsContainer.prepend(newCard);
       formAddCard.reset();
@@ -160,9 +162,21 @@ function handleImageClick(cardInfo) {
   openModal(popupImage);
 }
 
+function handleOpenDeleteModal(card) {
+  deleteCardForm.dataset.cardId = card.dataset.cardId;
+  openModal(deleteCardPopup);
+}
+
 function drawCards(cards, userId) {
   cards.forEach((item) => {
-    const card = createCard(item, template, handleLikeClick, handleImageClick, userId, openModal, closeModal, deleteCardPopup, openDeleteModal);
+    const card = createCard(
+      item,
+      template,
+      handleLikeClick,
+      handleImageClick,
+      userId,
+      handleOpenDeleteModal
+    );
     cardsContainer.append(card);
   });
 }
@@ -177,4 +191,3 @@ Promise.all([getCurrentUser(), getCardList()])
     drawCards(cards, user._id);
   })
   .catch((err) => console.error(`Ошибка: ${err}`));
-
